@@ -1,0 +1,8 @@
+#!/bin/bash
+urls=""
+toplevel=${1%/}
+#wget --quiet -O - $1 | grep --color=never --only-matching --perl-regexp --regexp="<a href=\"\K\/(album|track)[^\"]*" | \
+while read albumurl; do
+	urls="$urls $toplevel$albumurl"
+done < <(wget --quiet -O - $1 | grep --color=never --only-matching --perl-regexp --regexp="<a href=\"\K\/(album|track)[^\"]*")
+$(dirname $(realpath $0))/bandcampdl $urls

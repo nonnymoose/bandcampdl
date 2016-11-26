@@ -1,0 +1,37 @@
+#!/bin/bash
+albumfolder=0
+if [ $# -gt 1 ]; then
+	albumfolder=1
+fi
+while (( $# )); do
+	cnt=1
+	if [ $albumfolder -eq 1 ]; then
+		album=$(wget --quiet -O - $1 | grep --color=never "current:" | grep --only-matching --perl-regexp --color=never --regexp="title\":\"\K[^\"]*")
+		if [[ -n $(echo $album | grep --color=never --only-matching --perl-regexp -i --regexp="(collection|pack|mega)") ]]; then
+			echo -n "This album ($album) might be some sort of album collection. Are you sure you want to download? [Y/n] "
+			read response
+			if [ -n $(echo "$response" | grep --color=never --only-matching -i "n") ]; then
+				shift
+				continue
+			fi
+		fi
+		echo "Creating album folder \"$album\"..."
+		mkdir "$album" || exit 1
+		cd "$album" || exit 1
+	fi
+	wget --quiet -O - $1 | grep --color=never "trackinfo:" | grep --only-matching --perl-regexp --color=never --regexp="(title\":\"\K[^\"]*)|(mp3-128\"\:\"\/\/\K[^\"]*)" | \
+	while read title && read url; do
+		if [ $cnt -lt 10 ]; then
+			echo "Downloading \"0$cnt.$title.mp3\"..."
+			wget --quiet $url -O "0$cnt.$title.mp3"
+		else
+			echo "Downloading \"$cnt.$title.mp3\"..."
+			wget --quiet $url -O "$cnt.$title.mp3"
+		fi
+		((cnt++))
+	done
+	if [ $albumfolder -eq 1 ]; then
+		cd ..
+	fi
+	shift
+done

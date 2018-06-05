@@ -1,6 +1,8 @@
 # bandcampdl
 Downloads music albums and tracks from Bandcamp
 
+**NOTICE:** This project has been moved to GitLab, and all future development will occur there. https://gitlab.com/nonnymoose/bandcampdl
+
 Run the `bandcampdl` script with each url as an argument to download the corresponding albums from Bandcamp.
 It **will** warn you if you attempt to download some sort of album collection.
 
